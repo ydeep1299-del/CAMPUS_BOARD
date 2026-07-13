@@ -1,0 +1,42 @@
+name: CI
+
+# When this workflow runs:
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Install & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repo code onto the runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js (match this to your local Node version)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Install dependencies exactly as package-lock.json specifies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. (Optional) Lint the code - uncomment if you add ESLint later
+      # - name: Run ESLint
+      #   run: npm run lint
+
+      # 5. Build the app - this is the main check.
+      #    If any file has a broken import, syntax error, or missing
+      #    dependency, this step fails and the whole workflow goes red.
+      - name: Build project
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
